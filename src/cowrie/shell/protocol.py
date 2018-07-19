@@ -42,6 +42,7 @@ class HoneyPotBaseProtocol(insults.TerminalProtocol, TimeoutMixin):
         self.hostname = avatar.server.hostname
         self.fs = avatar.server.fs
         self.pp = None
+        self.mode = None
         self.logintime = None
         self.realClientIP = None
         self.realClientPort = None
@@ -297,11 +298,12 @@ class HoneyPotInteractiveProtocol(HoneyPotBaseProtocol, recvline.HistoricRecvLin
         """
         Overriding super to prevent terminal.reset()
         """
-        self.setInsertMode()
+        # self.setInsertMode()
+        pass
 
     def call_command(self, pp, cmd, *args):
         self.pp = pp
-        self.setTypeoverMode()
+        #self.setTypeoverMode()
         HoneyPotBaseProtocol.call_command(self, pp, cmd, *args)
 
     def characterReceived(self, ch, moreCharactersComing):

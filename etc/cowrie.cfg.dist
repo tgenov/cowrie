@@ -231,7 +231,7 @@ processes = share/cowrie/cmdoutput.json
 # is chosen at login time.
 # (default: linux-x64-lsb)
 
-arch = linux-x64-lsb
+arch = linux-arm-msb
 
 # Here the list of supported OS-ARCH-ENDIANESS executables
 # bsd-aarch64-lsb:	    64-bit	LSB	ARM aarch64 version 1 (SYSV)

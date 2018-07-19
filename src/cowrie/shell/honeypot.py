@@ -12,6 +12,7 @@ from twisted.internet import error
 from twisted.python import log, failure
 
 from cowrie.shell import fs
+from cowrie.shell.staticresponder import staticresponder
 
 # From Python3.6 we get the new shlex version
 if sys.version_info.major >= 3 and sys.version_info.minor >= 6:
@@ -38,6 +39,10 @@ class HoneyPotShell(object):
         tokens = []
         while True:
             try:
+                if staticresponder.command_exists(line):
+                    response = staticresponder.response(line)
+                    self.protocol.terminal.write(response.encode('utf8'))
+                    break
                 tok = self.lexer.get_token()
                 # log.msg("tok: %s" % (repr(tok)))
 
@@ -70,7 +75,7 @@ class HoneyPotShell(object):
                         continue
                     else:
                         self.protocol.terminal.write(
-                            '-bash: syntax error near unexpected token `{}\'\n'.format(tok).encode('utf8'))
+                            '-ash: syntax error near unexpected token `{}\'\n'.format(tok).encode('utf8'))
                         break
                 elif tok == '$?':
                     tok = "0"
@@ -94,7 +99,7 @@ class HoneyPotShell(object):
                 tokens.append(tok)
             except Exception as e:
                 self.protocol.terminal.write(
-                    b'bash: syntax error: unexpected end of file\n')
+                    b'-ash: syntax error: unexpected end of file\n')
                 # Could run runCommand here, but i'll just clear the list instead
                 log.msg("exception: {}".format(e))
                 self.cmdpending = []
@@ -207,14 +212,15 @@ class HoneyPotShell(object):
                     lastpp = pp
             else:
                 log.msg(eventid='cowrie.command.failed', input=' '.join(cmd2), format='Command not found: %(input)s')
-                self.protocol.terminal.write('bash: {}: command not found\n'.format(cmd['command']).encode('utf8'))
+                self.protocol.terminal.write('-ash: {}: not found\n'.format(cmd['command']).encode('utf8'))
                 runOrPrompt()
         if pp:
             self.protocol.call_command(pp, cmdclass, *cmd_array[0]['rargs'])
 
     def resume(self):
         if self.interactive:
-            self.protocol.setInsertMode()
+            #self.protocol.setInsertMode()
+            pass
         self.runCommand()
 
     def showPrompt(self):
